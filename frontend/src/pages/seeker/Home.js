@@ -15,9 +15,15 @@ function Home() {
     try {
       const res = await fetch("http://localhost:5000/applications");
       const data = await res.json();
-      setApplications(data || []);
+
+      // Gelen veriyi kontrol et (res.data.applications veya direkt data olabilir)
+      const appsResult = Array.isArray(data) ? data : (data.applications || []);
+
+      console.log("Gelen Başvurular:", appsResult);
+      setApplications(appsResult);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch hatası:", err);
+      setApplications([]);
     } finally {
       setLoading(false);
     }
@@ -29,7 +35,7 @@ function Home() {
 
   const addApplication = async () => {
     if (!company || !position) return;
-    
+
     await fetch("http://localhost:5000/applications/add", {
       method: "POST",
       headers: {
@@ -77,7 +83,10 @@ function Home() {
     }
   };
 
-  const filteredApps = (applications || []).filter(
+  // GÜVENLİ KULLANIM
+  const safeApplications = Array.isArray(applications) ? applications : [];
+
+  const filteredApps = safeApplications.filter(
     (app) =>
       (filter === "all" || app.status?.toLowerCase() === filter.toLowerCase()) &&
       app.company?.toLowerCase().includes(search.toLowerCase())
@@ -91,7 +100,7 @@ function Home() {
           <h1 style={{ color: "#0f172a", fontSize: "2rem", fontWeight: "800", margin: 0, letterSpacing: "-0.5px" }}>Başvurularım</h1>
           <p style={{ color: "#64748b", marginTop: "8px", fontSize: "1rem" }}>İş arama sürecinizi profesyonelce yönetin</p>
         </div>
-        <button 
+        <button
           onClick={() => setShowAddForm(!showAddForm)}
           style={addBtn}
         >
@@ -208,7 +217,7 @@ function Home() {
                       <option value="reddedildi">Reddedildi</option>
                     </select>
                   </div>
-                  <button 
+                  <button
                     onClick={() => deleteApplication(app.id)}
                     style={deleteBtn}
                     title="Sil"
