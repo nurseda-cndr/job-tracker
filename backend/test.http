@@ -1,0 +1,12 @@
+POST http://localhost:5000/applications/add
+Content-Type: application/json
+
+{
+  "company": "Google",
+  "position": "Backend Intern",
+  "status": "interview"
+}
+###
+GET http://localhost:5000/applications
+###
+DELETE http://localhost:5000/applications/delete/6
